@@ -10,12 +10,16 @@ LABEL description='pflare_spack'
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CHECKOUT_BRANCH=$BRANCH
-# In case spack builds with openmpi, allow running as root
-# or the parallel check fails
-ENV OMPI_ALLOW_RUN_AS_ROOT=1
-ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+
+# Create non-root user and allow writing to the Spack store/DB (keeps cache reuse)
+RUN useradd -m -s /bin/bash -u 1000 builder && \
+    chown -R builder:builder /opt/spack
 
 WORKDIR /build/
+RUN chown -R builder:builder /build
+
+USER builder
+ENV HOME=/home/builder
 
 # Build and install PFLARE with spack, test it works
 # We build the main version of PFLARE with python bindings and Kokkos support
