@@ -2,13 +2,18 @@
 
 Usage:
 1) Clone this repo
-   
+
 2) Add this repo to Spack:
-   - spack repo add pflare-spack-repo
-   - spack repo list
+   ```bash
+   spack repo add PFLARE_spack
+   ```
 
 3) Install PFLARE and check it worked:
-   - spack install --test=root pflare+python
+   ```bash
+   spack install --test=root pflare+python
+   ```
 
-4) To use PFLARE (this sets environmental variables):
-   - spack load pflare+python
+4) To enable easy building/linking with PFLARE (this sets environmental variables):
+   ```bash
+   spack load pflare+python
+   ```
