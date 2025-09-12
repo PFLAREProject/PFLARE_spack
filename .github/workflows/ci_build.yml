@@ -1,0 +1,54 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # run on the 1st of the month for new petsc release
+  # do it at 2am UTC so that the CI builds have finished
+  schedule:
+    - cron: '0 2 1 * *'    
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:       
+
+jobs:
+  setup:
+    runs-on: ubuntu-22.04
+    outputs:
+      branch: ${{ steps.determine_branch.outputs.branch }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Determine branch
+        id: determine_branch
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "branch=${{ github.event.pull_request.head.ref }}" >> $GITHUB_OUTPUT
+          else
+            echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: free disk space
+        run: |
+          docker system prune --volumes -af            
+
+  pflare_build_spack:
+    runs-on: ubuntu-22.04
+    needs: setup
+    env:
+      BRANCH: ${{ needs.setup.outputs.branch }}
+    steps:
+      - name: Build Docker image to test PFLARE spack build
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64
+          push: false
+          file: ./dockerfiles/Dockerfile
+          build-args: |
+            BRANCH=${{ env.BRANCH }}          
