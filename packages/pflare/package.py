@@ -20,7 +20,8 @@ class Pflare(MakefilePackage):
     maintainers("stevendargaville")
     license("MIT", checked_by="stevendargaville")
 
-    version("1.24.1", sha256="f9b88da459065111a4f20fc356acab96d8205b2ddca7b420f9f9f41c5302264f")
+    version("1.24.1", sha256="f9b88da459065111a4f20fc356acab96d8205b2ddca7b420f9f9f41c5302264f", preferred=True)
+    version("main", branch="main")
 
     # Optionally build the python bindings
     variant("python", default=False, description="Enable PFLARE Python bindings via petsc4py")
