@@ -13,7 +13,7 @@ Usage:
    spack install --test=root pflare+python
    ```
 
-4) To enable easy building/linking with PFLARE (this sets environmental variables):
+4) To enable easy linking to PFLARE (this sets environmental variables):
    ```bash
    spack load pflare+python
    ```
