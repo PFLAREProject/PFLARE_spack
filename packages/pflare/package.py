@@ -58,7 +58,14 @@ class Pflare(MakefilePackage):
                 os.unlink(link)
             except OSError:
                 pass
-        os.symlink(petsc_src_dir, link)                     
+        os.symlink(petsc_src_dir, link)  
+
+        # Unsilence tests so CI logs show output
+        test_mk = join_path(self.stage.source_path, "tests", "Makefile")
+        if os.path.exists(test_mk):
+            # Drop redirection to /dev/null and leading '@' that hides commands
+            filter_file(r'>\s*/dev/null\s*2>&1', '', test_mk)
+            filter_file(r'^\t@', '\t', test_mk)                           
 
     # No need to override PYTHON/PYTHONPATH here; use Spack’s python wrapper via PATH
     def setup_build_environment(self, env):
