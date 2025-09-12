@@ -12,7 +12,7 @@ class Pflare(MakefilePackage):
     """Library with parallel iterative methods for asymmetric linear systems built on PETSc."""
 
     homepage = "https://github.com/PFLAREProject/PFLARE"
-    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.23.tar.gz"
+    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.24.tar.gz"
     git = "https://github.com/PFLAREProject/PFLARE.git"
 
     # Add a list of GitHub accounts to
