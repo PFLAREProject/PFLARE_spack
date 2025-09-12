@@ -12,7 +12,7 @@ class Pflare(MakefilePackage):
     """Library with parallel iterative methods for asymmetric linear systems built on PETSc."""
 
     homepage = "https://github.com/PFLAREProject/PFLARE"
-    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.24.tar.gz"
+    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.24.1.tar.gz"
     git = "https://github.com/PFLAREProject/PFLARE.git"
 
     # Add a list of GitHub accounts to
@@ -20,7 +20,7 @@ class Pflare(MakefilePackage):
     maintainers("stevendargaville")
     license("MIT", checked_by="stevendargaville")
 
-    version("1.24", sha256="09c2e546d7a53c967263d2979b478951f0bae16fae152573be6e4a8afb0bba78")
+    version("1.24.1", sha256="f9b88da459065111a4f20fc356acab96d8205b2ddca7b420f9f9f41c5302264f")
 
     # Optionally build the python bindings
     variant("python", default=False, description="Enable PFLARE Python bindings via petsc4py")
