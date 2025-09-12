@@ -10,6 +10,10 @@ LABEL description='pflare_spack'
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV CHECKOUT_BRANCH=$BRANCH
+# In case spack builds with openmpi, allow running as root
+# or the parallel check fails
+ENV OMPI_ALLOW_RUN_AS_ROOT=1
+ENV OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
 
 WORKDIR /build/
 
