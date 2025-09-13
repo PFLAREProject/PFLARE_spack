@@ -58,7 +58,7 @@ class Pflare(MakefilePackage):
                 os.unlink(link)
             except OSError:
                 pass
-        os.symlink(petsc_src_dir, link)                     
+        os.symlink(petsc_src_dir, link)                        
 
     # No need to override PYTHON/PYTHONPATH here; use Spack’s python wrapper via PATH
     def setup_build_environment(self, env):
