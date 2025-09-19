@@ -23,9 +23,11 @@ ENV HOME=/home/builder
 
 # Build and install PFLARE with spack, test it works
 # We build the main version of PFLARE with python bindings and Kokkos support
+# and also a version without
 RUN set -e; \
     echo "Cloning branch: ${CHECKOUT_BRANCH}" && \
     git clone --branch ${CHECKOUT_BRANCH} https://github.com/PFLAREProject/PFLARE_spack.git && \
     spack repo add PFLARE_spack && \
-    spack install -v --test=root pflare@main+python ^petsc+kokkos
+    spack install -v --test=root pflare@main+python ^petsc+kokkos && \
+    spack install -v --test=root pflare@main
 
