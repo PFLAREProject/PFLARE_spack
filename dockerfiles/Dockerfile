@@ -28,6 +28,7 @@ RUN set -e; \
     echo "Cloning branch: ${CHECKOUT_BRANCH}" && \
     git clone --branch ${CHECKOUT_BRANCH} https://github.com/PFLAREProject/PFLARE_spack.git && \
     spack repo add PFLARE_spack && \
-    spack install -v --test=root pflare@main+python ^petsc+kokkos && \
-    spack install -v --test=root pflare@main
+    spack install -v --test=root pflare@main && \
+    spack install -v --test=root pflare@main+python ^petsc+kokkos
+    
 
