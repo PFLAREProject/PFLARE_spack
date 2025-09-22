@@ -22,12 +22,15 @@ USER builder
 ENV HOME=/home/builder
 
 # Build and install PFLARE with spack, test it works
-# We build the main version of PFLARE with python bindings and Kokkos support
-# and also a version without
+# We build the main branch of PFLARE against three different petsc buids
+# 1) Static libraries
+# 2) Shared libraries
+# 3) Shared libraries + python + kokkos
 RUN set -e; \
     echo "Cloning branch: ${CHECKOUT_BRANCH}" && \
     git clone --branch ${CHECKOUT_BRANCH} https://github.com/PFLAREProject/PFLARE_spack.git && \
     spack repo add PFLARE_spack && \
+    spack install -v --test=root pflare@main ^petsc~shared && \
     spack install -v --test=root pflare@main && \
     spack install -v --test=root pflare@main+python ^petsc+kokkos
     
