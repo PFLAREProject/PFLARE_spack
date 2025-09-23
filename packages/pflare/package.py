@@ -2,11 +2,14 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import os
+
 from spack_repo.builtin.build_systems.makefile import MakefilePackage
+
+from spack.package import *
 from spack.util.environment import EnvironmentModifications
 from spack.util.executable import which
-from spack.package import *
-import os
+
 
 class Pflare(MakefilePackage):
     """Library with parallel iterative methods for asymmetric linear systems built on PETSc."""
@@ -20,7 +23,11 @@ class Pflare(MakefilePackage):
     maintainers("stevendargaville")
     license("MIT", checked_by="stevendargaville")
 
-    version("1.24.8", sha256="b0a202466729b680f28506fcc9043aef59797c0a4ee5d0a0dbf43a42107fe7cf", preferred=True)
+    version(
+        "1.24.8",
+        sha256="b0a202466729b680f28506fcc9043aef59797c0a4ee5d0a0dbf43a42107fe7cf",
+        preferred=True,
+    )
     version("main", branch="main")
 
     # Optionally build the python bindings
@@ -58,7 +65,7 @@ class Pflare(MakefilePackage):
                 os.unlink(link)
             except OSError:
                 pass
-        os.symlink(petsc_src_dir, link)                        
+        os.symlink(petsc_src_dir, link)
 
     # No need to override PYTHON/PYTHONPATH here; use Spack’s python wrapper via PATH
     def setup_build_environment(self, env):
@@ -94,7 +101,9 @@ class Pflare(MakefilePackage):
     # ~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~
     def install(self, spec, prefix):
-        import os, glob
+        import glob
+        import os
+
         mkdirp(prefix.include)
         mkdirp(prefix.lib)
 
@@ -125,7 +134,7 @@ class Pflare(MakefilePackage):
             # Copy only the shim module
             shim = "python/pflare.py"
             if os.path.exists(shim):
-                install(shim, pydir)                
+                install(shim, pydir)
 
         # ~~~~~~~~~~~~~~~
         # Write out a pkg-config file
@@ -147,21 +156,21 @@ Libs: -L${{libdir}} -lpflare
 Requires: petsc
 """
         with open(join_path(pcdir, "pflare.pc"), "w") as f:
-            f.write(pc)        
+            f.write(pc)
 
     # ~~~~~~~~~~~~~~~
     # Let dependents query include and link flags
     # ~~~~~~~~~~~~~~~
     def headers(self):
-          # Expose the whole include tree (Fortran .mod and C headers)
-          hdrs = find_headers("*", self.prefix.include, recursive=True)
-          return hdrs
+        # Expose the whole include tree (Fortran .mod and C headers)
+        hdrs = find_headers("*", self.prefix.include, recursive=True)
+        return hdrs
 
     def libs(self):
-          libs = find_libraries("libpflare", self.prefix.lib, shared=True, recursive=False)
-          if not libs:
-             libs = find_libraries("libpflare", self.prefix.lib, shared=False, recursive=False)
-          return libs            
+        libs = find_libraries("libpflare", self.prefix.lib, shared=True, recursive=False)
+        if not libs:
+            libs = find_libraries("libpflare", self.prefix.lib, shared=False, recursive=False)
+        return libs
 
     # ~~~~~~~~~~~~~~~
     # Provide environment variables when spack load pflare is called
@@ -169,6 +178,7 @@ Requires: petsc
     # ~~~~~~~~~~~~~~~
     def setup_run_environment(self, env):
         import os
+
         # Runtime and build path-like vars
         env.prepend_path("LD_LIBRARY_PATH", self.prefix.lib)
         env.prepend_path("LIBRARY_PATH", self.prefix.lib)
@@ -180,10 +190,10 @@ Requires: petsc
 
         # Optional: provide ready-to-use flags for simple Makefiles
         env.append_flags("CPPFLAGS", f"-I{self.prefix.include}")
-        env.append_flags("CFLAGS",   f"-I{self.prefix.include}")
+        env.append_flags("CFLAGS", f"-I{self.prefix.include}")
         env.append_flags("CXXFLAGS", f"-I{self.prefix.include}")
-        env.append_flags("FFLAGS",   f"-I{self.prefix.include}")    # Fortran .mod includes
-        env.append_flags("LDFLAGS",  f"-L{self.prefix.lib} -Wl,-rpath,{self.prefix.lib}")
+        env.append_flags("FFLAGS", f"-I{self.prefix.include}")  # Fortran .mod includes
+        env.append_flags("LDFLAGS", f"-L{self.prefix.lib} -Wl,-rpath,{self.prefix.lib}")
 
         if "+python" in self.spec:
             pyver = self.spec["python"].version.up_to(2)
@@ -199,7 +209,7 @@ Requires: petsc
         try:
             self.spec["petsc"].package.stage.destroy()
         except Exception:
-            pass                
+            pass
 
     # ~~~~~~~~~~~~~~~
     # Check setup_run_environment and the python import works after the install
