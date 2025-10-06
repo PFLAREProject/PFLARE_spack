@@ -23,5 +23,9 @@ Usage:
 
 4) To enable easy linking to PFLARE (this sets environmental variables):
    ```bash
-   spack load pflare+python
+   spack load pflare
    ```
+   or if PFLARE was installed with the Python variant
+   ```bash
+   spack load pflare+python
+   ```   
