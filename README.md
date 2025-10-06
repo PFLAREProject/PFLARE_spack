@@ -1,5 +1,7 @@
 # PFLARE Spack External Repository
 
+This repository provides a Spack package for PFLARE (https://github.com/PFLAREProject/PFLARE), including optional support for Python bindings via Cython and PETSc4Py.
+
 Usage:
 1) Clone this repo
 
@@ -8,24 +10,36 @@ Usage:
    spack repo add PFLARE_spack
    ```
 
-3) Install PFLARE and check it worked:
+3) Install PFLARE:
    ```bash
-   spack install --test=root pflare
+   spack install pflare
    ```
-   or there is a Python variant that uses petsc4py to build Python bindings for PFLARE:
+   PFLARE depends on PETSc, so the build configuration will follow the PETSc options you choose. For example, to build a static version of PETSc (and hence PFLARE), set the shared library variant for PETSc to false:
    ```bash
-   spack install --test=root pflare+python
-   ```   
-   All other configurations depend on the options used during the PETSc build. For example, to build a static version of PFLARE, set the shared library variant for PETSc to false:
+   spack install pflare ^petsc~shared
+   ```
+   or for example, to build PETSc (and hence PFLARE) with 64 bit integers:
    ```bash
-   spack install --test=root pflare ^petsc~shared
-   ```      
-
-4) To enable easy linking to PFLARE (this sets environmental variables):
+   spack install pflare ^petsc+int64
+   ```
+   
+4) After installation, you can set up your environment (e.g., ``LD_LIBRARY_PATH``, etc.) using:
    ```bash
    spack load pflare
    ```
-   or if PFLARE was installed with the Python variant
+
+## Optional Python variant
+   
+1) To build PFLARE with Python bindings (via Cython and PETSc4Py):
+   ```bash
+   spack install pflare+python
+   ```
+   or the test flag can be added to check that the Python bindings are built during the install:
+   ```bash
+   spack install --test=root pflare+python
+   ```
+   
+2) After installation, you can set up your environment (including ``PYTHONPATH``) using:
    ```bash
    spack load pflare+python
-   ```   
+   ```      
