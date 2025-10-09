@@ -14,7 +14,7 @@ class Pflare(MakefilePackage):
     """Library with parallel iterative methods for asymmetric linear systems built on PETSc."""
 
     homepage = "https://github.com/PFLAREProject/PFLARE"
-    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.24.8.tar.gz"
+    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.24.9.tar.gz"
     git = "https://github.com/PFLAREProject/PFLARE.git"
 
     # Add a list of GitHub accounts to
@@ -23,8 +23,8 @@ class Pflare(MakefilePackage):
     license("MIT", checked_by="stevendargaville")
 
     version(
-        "1.24.8",
-        sha256="b0a202466729b680f28506fcc9043aef59797c0a4ee5d0a0dbf43a42107fe7cf",
+        "1.24.9",
+        sha256="29e09a628d5bb59829b1f26106346608644b46fd9255c828036f003ef877b047",
         preferred=True,
     )
     version("main", branch="main")
@@ -39,6 +39,8 @@ class Pflare(MakefilePackage):
     depends_on("metis")
     depends_on("parmetis")
     depends_on("petsc@3.23.1:")
+    # Bug fixed in https://gitlab.com/petsc/petsc/-/merge_requests/8768
+    conflict("^petsc@3.24.0", msg="PETSc 3.24.0 has a known bug in a routine used in PFLARE")
     # Optional Python dependencies (needed at build/run time by python/setup.py)
     depends_on("python", when="+python", type=("build", "run"))
     depends_on("py-setuptools", when="+python", type="build")
