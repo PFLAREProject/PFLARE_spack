@@ -40,7 +40,7 @@ class Pflare(MakefilePackage):
     depends_on("parmetis")
     depends_on("petsc@3.23.1:")
     # Bug fixed in https://gitlab.com/petsc/petsc/-/merge_requests/8768
-    conflict("^petsc@3.24.0", msg="PETSc 3.24.0 has a known bug in a routine used in PFLARE")
+    conflicts("^petsc@3.24.0", msg="PETSc 3.24.0 has a known bug in a routine used in PFLARE")
     # Optional Python dependencies (needed at build/run time by python/setup.py)
     depends_on("python", when="+python", type=("build", "run"))
     depends_on("py-setuptools", when="+python", type="build")
