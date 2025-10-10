@@ -102,62 +102,11 @@ class Pflare(MakefilePackage):
     # ~~~~~~~~~~~~~~~
     # ~~~~~~~~~~~~~~~
     def install(self, spec, prefix):
-        import glob
-        import os
-
-        mkdirp(prefix.include)
-        mkdirp(prefix.lib)
-
-        # Headers (recursively, includes include/finclude)
-        install_tree("include", prefix.include)
-
-        # Library (shared preferred if present)
-        if os.path.exists("lib/libpflare.so"):
-            install("lib/libpflare.so", prefix.lib)
-        elif os.path.exists("lib/libpflare.a"):
-            install("lib/libpflare.a", prefix.lib)
-        else:
-            raise InstallError("PFLARE library not found in lib/")
-
-        # Fortran module files: from lib/ and top-level (compiler-dependent)
-        for mod in glob.glob("lib/*.mod"):
-            install(mod, prefix.include)
-        for mod in glob.glob("*.mod"):
-            install(mod, prefix.include)
-
-        # Python extension (if built) – place into site-packages
+        args = [f"PREFIX={prefix}"]
         if "+python" in spec:
             pyver = spec["python"].version.up_to(2)
-            pydir = join_path(prefix.lib, f"python{pyver}", "site-packages")
-            mkdirp(pydir)
-            for so in glob.glob("python/*.so"):
-                install(so, pydir)
-            # Copy only the shim module
-            shim = "python/pflare.py"
-            if os.path.exists(shim):
-                install(shim, pydir)
-
-        # ~~~~~~~~~~~~~~~
-        # Write out a pkg-config file
-        # Allows users to easily discover and link against PFLARE
-        # using `pkg-config --cflags --libs pflare`
-        # ~~~~~~~~~~~~~~~
-        pcdir = join_path(prefix.lib, "pkgconfig")
-        mkdirp(pcdir)
-        pc = f"""prefix={prefix}
-exec_prefix=${{prefix}}
-libdir=${{prefix}}/lib
-includedir=${{prefix}}/include
-
-Name: pflare
-Description: Library with parallel iterative methods for asymmetric linear systems built on PETSc.
-Version: {self.version}
-Cflags: -I${{includedir}}
-Libs: -L${{libdir}} -lpflare
-Requires: petsc
-"""
-        with open(join_path(pcdir, "pflare.pc"), "w") as f:
-            f.write(pc)
+            args.append(f"PYVER={pyver}")
+        make("install", *args)
 
     # ~~~~~~~~~~~~~~~
     # Let dependents query include and link flags
