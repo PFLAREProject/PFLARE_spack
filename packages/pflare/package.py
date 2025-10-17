@@ -33,6 +33,10 @@ class Pflare(MakefilePackage):
     variant("python", default=False, description="Enable PFLARE Python bindings via petsc4py")
 
     # --- Dependencies ---
+    depends_on("c", type="build")
+    depends_on("cxx", type="build")
+    depends_on("fortran", type="build")
+        
     depends_on("mpi")
     depends_on("blas")
     depends_on("lapack")
