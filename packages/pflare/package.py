@@ -4,7 +4,7 @@
 
 import os
 
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
+from spack.build_systems.makefile import MakefilePackage
 
 from spack.package import *
 from spack.util.environment import EnvironmentModifications
@@ -23,9 +23,17 @@ class Pflare(MakefilePackage):
     license("MIT", checked_by="stevendargaville")
 
     version(
+        "1.25.0",
+        sha256="befb361b39c7601a8ca6f148369313f5755b238d5f6a4cbf91b19b23c93e8952",
+        preferred=True,
+    )
+    version(
+        "1.24.11",
+        sha256="8bcbee9e58ac3b2627dfbe78ebfac375192fb97d87337b40962d2730935ea1ce",
+    )
+    version(
         "1.24.10",
         sha256="1d51ea420413d9959ea1a8a9499a663487672f08107838eaa6be11eab1e6fc2a",
-        preferred=True,
     )
     version("main", branch="main")
 
@@ -42,9 +50,15 @@ class Pflare(MakefilePackage):
     depends_on("lapack")
     depends_on("metis")
     depends_on("parmetis")
-    depends_on("petsc@3.23.1:")
-    # Bug fixed in https://gitlab.com/petsc/petsc/-/merge_requests/8768
-    conflicts("^petsc@3.24.0", msg="PETSc 3.24.0 has a known bug in a routine used in PFLARE")
+
+    # PETSc version dependencies
+    depends_on("petsc@3.24.1:", when="@1.25.0:")
+    depends_on("petsc@3.23.1:3.23.7", when="@:1.24.11")
+    # Bugs in 3.24.0 fixed in:
+    #  https://gitlab.com/petsc/petsc/-/merge_requests/8768
+    #  https://gitlab.com/petsc/petsc/-/merge_requests/8713
+    conflicts("^petsc@3.24.0", msg="PETSc 3.24.0 has a known bugs in routines used by PFLARE")
+    
     # Optional Python dependencies (needed at build/run time by python/setup.py)
     depends_on("python", when="+python", type=("build", "run"))
     depends_on("py-setuptools", when="+python", type="build")
