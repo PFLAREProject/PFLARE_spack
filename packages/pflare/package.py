@@ -23,10 +23,11 @@ class Pflare(MakefilePackage):
     license("MIT", checked_by="stevendargaville")
 
     version(
-        "1.25.0",
-        sha256="befb361b39c7601a8ca6f148369313f5755b238d5f6a4cbf91b19b23c93e8952",
+        "1.25.1",
+        sha256="54f26bd604679b9b9010d157c1e32aad05d1a3610632d75c742419e659001903",
         preferred=True,
     )
+    version("1.25.0", sha256="befb361b39c7601a8ca6f148369313f5755b238d5f6a4cbf91b19b23c93e8952")
     version("1.24.11", sha256="8bcbee9e58ac3b2627dfbe78ebfac375192fb97d87337b40962d2730935ea1ce")
     version("1.24.10", sha256="1d51ea420413d9959ea1a8a9499a663487672f08107838eaa6be11eab1e6fc2a")
     version("main", branch="main")
@@ -46,6 +47,7 @@ class Pflare(MakefilePackage):
     depends_on("parmetis")
 
     # PETSc version dependencies
+    depends_on("petsc@main", when="@main")
     depends_on("petsc@3.24.1:", when="@1.25.0:")
     depends_on("petsc@3.23.1:3.23.7", when="@:1.24.11")
     # Bugs in 3.24.0 fixed in:
