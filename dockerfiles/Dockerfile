@@ -12,7 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV CHECKOUT_BRANCH=$BRANCH
 
 # Create non-root user and allow writing to the Spack store/DB (keeps cache reuse)
-RUN useradd -m -s /bin/bash -u 1000 builder && \
+RUN useradd -m -s /bin/bash -u 2000 builder && \
     chown -R builder:builder /opt/spack
 
 WORKDIR /build/
