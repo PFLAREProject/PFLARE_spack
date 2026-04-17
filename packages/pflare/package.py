@@ -127,11 +127,13 @@ class Pflare(MakefilePackage):
     # ~~~~~~~~~~~~~~~
     # Let dependents query include and link flags
     # ~~~~~~~~~~~~~~~
+    @property
     def headers(self):
         # Expose the whole include tree (Fortran .mod and C headers)
         hdrs = find_headers("*", self.prefix.include, recursive=True)
         return hdrs
 
+    @property
     def libs(self):
         libs = find_libraries("libpflare", self.prefix.lib, shared=True, recursive=False)
         if not libs:
