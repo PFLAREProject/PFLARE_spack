@@ -26,12 +26,15 @@ ENV HOME=/home/builder
 # 1) Static libraries
 # 2) Shared libraries
 # 3) Shared libraries + python + kokkos
+# 4) Also build a dummy package pflare-test which depends on pflare to test
+#     the linking in spack for dependencies works correctly
 RUN set -e; \
     echo "Cloning branch: ${CHECKOUT_BRANCH}" && \
     git clone --branch ${CHECKOUT_BRANCH} https://github.com/PFLAREProject/PFLARE_spack.git && \
     spack repo add PFLARE_spack && \
     spack install -v --test=root pflare@main ^petsc~shared && \
     spack install -v --test=root pflare@main && \
-    spack install -v --test=root pflare@main+python ^petsc+kokkos
-    
+    spack install -v --test=root pflare@main+python ^petsc+kokkos && \
+    spack install -v --test=root pflare-test ^pflare@main
+
 
