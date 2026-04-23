@@ -5,8 +5,6 @@
 import os
 import shutil
 
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
-
 from spack.package import *
 from spack.util.executable import Executable
 
