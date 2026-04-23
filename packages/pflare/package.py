@@ -4,8 +4,6 @@
 
 import os
 
-from spack_repo.builtin.build_systems.makefile import MakefilePackage
-
 from spack.package import *
 from spack.util.environment import EnvironmentModifications
 
