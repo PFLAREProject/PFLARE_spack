@@ -47,6 +47,13 @@ class Pflare(MakefilePackage):
     depends_on("metis")
     depends_on("parmetis")
 
+    # Ensure PETSc itself is built with the metis+parmetis support PFLARE
+    # needs at runtime. The depends_on("parmetis") above
+    # alone only guarantees the library is built somewhere in the DAG, not that
+    # PETSc's own configure enabled it (metis/parmetis default to off in the PETSc spack).
+    # +metis variant activates support for both metis and parmetis.
+    depends_on("petsc+metis")
+
     # PETSc version dependencies
     depends_on("petsc@main", when="@main")
     depends_on("petsc@3.25.0:", when="@1.26.0:")
