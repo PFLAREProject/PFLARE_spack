@@ -41,18 +41,25 @@ class Pflare(MakefilePackage):
     depends_on("cxx", type="build")
     depends_on("fortran", type="build")
 
-    depends_on("mpi")
     depends_on("blas")
     depends_on("lapack")
-    depends_on("metis")
-    depends_on("parmetis")
+    depends_on("petsc")
 
-    # Ensure PETSc itself is built with the metis+parmetis support PFLARE
-    # needs at runtime. The depends_on("parmetis") above
-    # alone only guarantees the library is built somewhere in the DAG, not that
-    # PETSc's own configure enabled it (metis/parmetis default to off in the PETSc spack).
-    # +metis variant activates support for both metis and parmetis.
-    depends_on("petsc+metis")
+    # PFLARE 1.26.0 and earlier link MPI, metis and parmetis directly, and require
+    # PETSc itself to have been configured with them. A bare depends_on("parmetis")
+    # only guarantees the library is built somewhere in the DAG, not that PETSc's own
+    # configure enabled it, hence the explicit pin on the PETSc variants (PETSc's
+    # +metis variant activates support for both metis and parmetis).
+    #
+    # Newer versions of PFLARE build against the public PETSc API only. They can compile
+    # against a PETSc configured without MPI (MPIUNI), and fall back to
+    # MATPARTITIONINGAVERAGE when PETSc has no ParMETIS, so all three now follow
+    # whatever PETSc itself pulls in. Build ^petsc+metis for the best parallel
+    # repartitioning performance.
+    depends_on("mpi", when="@:1.26")
+    depends_on("metis", when="@:1.26")
+    depends_on("parmetis", when="@:1.26")
+    depends_on("petsc+mpi+metis", when="@:1.26")
 
     # PETSc version dependencies
     depends_on("petsc@main", when="@main")
@@ -72,10 +79,15 @@ class Pflare(MakefilePackage):
     depends_on("py-petsc4py", when="+python", type=("build", "run"))
 
     # ~~~~~~~~~~~~~~~
-    # The build itself needs private PETSc headers that aren't included in the petsc install
-    # So we tell spack to restage petsc during our build and then we set petsc_src_dir
+    # PFLARE 1.26.0 and earlier build against private PETSc headers that aren't included
+    # in the petsc install, so we tell spack to restage petsc during our build and then
+    # we set petsc_src_dir. Newer versions only use the public PETSc API, so they build
+    # against a plain petsc install (and hence also work with an external petsc).
     # ~~~~~~~~~~~~~~~
     def edit(self, spec, prefix):
+        if not spec.satisfies("@:1.26"):
+            return
+
         # Stage the PETSc source that matches the concretized dependency
         dep_pkg = self.spec["petsc"].package
         dep_pkg.do_stage()  # fetch+expand PETSc sources into its own stage
@@ -98,23 +110,28 @@ class Pflare(MakefilePackage):
             env.set("PYTHONNOUSERSITE", "1")
 
     # ~~~~~~~~~~~~~~~
-    # The build appends the petsc source files into our include flags
+    # For the versions that need it, the build appends the petsc source files into our
+    # include flags
     # ~~~~~~~~~~~~~~~
     def build(self, spec, prefix):
         from spack.util.environment import set_env
         from spack.util.executable import which
 
-        # Use the symlink created in edit()
-        petsc_inc_src = join_path(self.stage.source_path, "petsc_src_dir", "include")
-        if not os.path.isdir(petsc_inc_src):
-            raise InstallError(f"PETSc include directory not found at {petsc_inc_src}")
+        extra_env = {}
+        if spec.satisfies("@:1.26"):
+            # Use the symlink created in edit()
+            petsc_inc_src = join_path(self.stage.source_path, "petsc_src_dir", "include")
+            if not os.path.isdir(petsc_inc_src):
+                raise InstallError(f"PETSc include directory not found at {petsc_inc_src}")
 
-        extra_inc = f"-I{petsc_inc_src}"
-        with set_env(
-            CFLAGS=(f"{os.environ.get('CFLAGS', '')} {extra_inc}").strip(),
-            CXXFLAGS=(f"{os.environ.get('CXXFLAGS', '')} {extra_inc}").strip(),
-            CPPFLAGS=(f"{os.environ.get('CPPFLAGS', '')} {extra_inc}").strip(),
-        ):
+            extra_inc = f"-I{petsc_inc_src}"
+            extra_env = {
+                "CFLAGS": (f"{os.environ.get('CFLAGS', '')} {extra_inc}").strip(),
+                "CXXFLAGS": (f"{os.environ.get('CXXFLAGS', '')} {extra_inc}").strip(),
+                "CPPFLAGS": (f"{os.environ.get('CPPFLAGS', '')} {extra_inc}").strip(),
+            }
+
+        with set_env(**extra_env):
             # The Makefile has a `build_tests_check` target that builds the library and tests
             make("build_tests_check", parallel=True)
             if spec.satisfies("+python"):
@@ -180,6 +197,10 @@ class Pflare(MakefilePackage):
     # ~~~~~~~~~~~~~~~
     @run_after("install")
     def cleanup_petsc_stage(self):
+        # Only 1.26.0 and earlier stage PETSc in edit()
+        if not self.spec.satisfies("@:1.26"):
+            return
+
         # Avoid leaking a staged PETSc tree on disk
         try:
             self.spec["petsc"].package.stage.destroy()
