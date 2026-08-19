@@ -46,10 +46,10 @@ class Pflare(MakefilePackage):
     depends_on("petsc")
 
     # PFLARE 1.26.0 and earlier link MPI, metis and parmetis directly, and require
-    # PETSc itself to have been configured with them. A bare depends_on("parmetis")
-    # only guarantees the library is built somewhere in the DAG, not that PETSc's own
-    # configure enabled it, hence the explicit pin on the PETSc variants (PETSc's
-    # +metis variant activates support for both metis and parmetis).
+    # PETSc itself to have been configured with them. depends_on("parmetis") gives
+    # PFLARE its own link to parmetis, but says nothing about how PETSc was
+    # configured, hence the explicit pin on the PETSc variants (PETSc's +metis
+    # variant activates support for both metis and parmetis).
     #
     # Newer versions of PFLARE build against the public PETSc API only. They can compile
     # against a PETSc configured without MPI (MPIUNI), and fall back to
