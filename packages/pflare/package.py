@@ -14,7 +14,7 @@ class Pflare(MakefilePackage):
     """Library with parallel iterative methods for asymmetric linear systems built on PETSc."""
 
     homepage = "https://github.com/PFLAREProject/PFLARE"
-    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.26.0.tar.gz"
+    url = "https://github.com/PFLAREProject/PFLARE/archive/refs/tags/v1.27.0.tar.gz"
     git = "https://github.com/PFLAREProject/PFLARE.git"
 
     # Add a list of GitHub accounts to
@@ -24,10 +24,11 @@ class Pflare(MakefilePackage):
 
     version("main", branch="main")
     version(
-        "1.26.0",
-        sha256="442cecd0414932bcefe9af72d90baf80997fb1673f1926bad5cbf1cbcf2eec65",
+        "1.27.0",
+        sha256="2ea428f9e9f8041554932e384308643b9e8b02e22f772faac2b675d889281e0e",
         preferred=True,
     )
+    version("1.26.0", sha256="442cecd0414932bcefe9af72d90baf80997fb1673f1926bad5cbf1cbcf2eec65")
     version("1.25.1", sha256="54f26bd604679b9b9010d157c1e32aad05d1a3610632d75c742419e659001903")
     version("1.25.0", sha256="befb361b39c7601a8ca6f148369313f5755b238d5f6a4cbf91b19b23c93e8952")
     version("1.24.11", sha256="8bcbee9e58ac3b2627dfbe78ebfac375192fb97d87337b40962d2730935ea1ce")
@@ -51,7 +52,7 @@ class Pflare(MakefilePackage):
     # configure enabled it, hence the explicit pin on the PETSc variants (PETSc's
     # +metis variant activates support for both metis and parmetis).
     #
-    # Newer versions of PFLARE build against the public PETSc API only. They can compile
+    # PFLARE 1.27.0 and newer build against the public PETSc API only. They can compile
     # against a PETSc configured without MPI (MPIUNI), and fall back to
     # MATPARTITIONINGAVERAGE when PETSc has no ParMETIS, so all three now follow
     # whatever PETSc itself pulls in. Build ^petsc+metis for the best parallel
@@ -63,7 +64,8 @@ class Pflare(MakefilePackage):
 
     # PETSc version dependencies
     depends_on("petsc@main", when="@main")
-    depends_on("petsc@3.25.0:", when="@1.26.0:")
+    depends_on("petsc@3.26.0:3.26", when="@1.27.0")
+    depends_on("petsc@3.25.0:3.25.6", when="@1.26.0")
     depends_on("petsc@3.24.1:3.24.6", when="@1.25.0:1.25.1")
     depends_on("petsc@3.23.1:3.23.7", when="@:1.24.11")
     # Bugs in 3.24.0 fixed in:
@@ -81,8 +83,9 @@ class Pflare(MakefilePackage):
     # ~~~~~~~~~~~~~~~
     # PFLARE 1.26.0 and earlier build against private PETSc headers that aren't included
     # in the petsc install, so we tell spack to restage petsc during our build and then
-    # we set petsc_src_dir. Newer versions only use the public PETSc API, so they build
-    # against a plain petsc install (and hence also work with an external petsc).
+    # we set petsc_src_dir. PFLARE 1.27.0 and newer only use the public PETSc API, so
+    # they build against a plain petsc install (and hence also work with an external
+    # petsc).
     # ~~~~~~~~~~~~~~~
     def edit(self, spec, prefix):
         if not spec.satisfies("@:1.26"):
